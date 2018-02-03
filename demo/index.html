@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>Bootstrap 101 Template</title>
+
+    <!-- Bootstrap -->
+    <link href="/node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+    <br/>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-2 col-md-8">
+                <h1>使用场景1：根据经纬度定位</h1>
+                <div style="margin-top:15px; width:100%; height:300px;" 
+                    data-gaode-place="true" 
+                    data-name="杭州赫码科技" 
+                    data-addr="杭州市萧山区博地世纪中心"
+                    data-position='[120.252128,30.236821]'>
+                </div>
+                <h1>使用场景2：行政区域选择</h1>
+                <div data-gaode-area="true">
+                        <div class="form-inline">
+                                <div class="form-group">
+                                    <label> 省份：</label>
+                                    <select data-level="province" class="form-control"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label> 城市：</label>
+                                    <select data-level="city" class="form-control"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label> 区：</label>
+                                    <select data-level="district" class="form-control"></select>
+                                </div>
+                            </div>
+                </div>
+                
+                <h1>使用场景3：行政区域选择+定位+弹出框</h1>
+                <form class="form">
+                    <div class="hide" id="hiddenArea"></div>
+                    <div class="hide" id="hiddenNearby"></div>
+                    <div id="full-addr"></div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-backdrop='static' data-target="#mapModal">定位</button>
+                        <button class="btn btn-success">保存</button>
+                    </div>
+                    <div>
+                        <div class="modal fade" id="mapModal">
+                            <div class="modal-dialog modal-lg " id="map-box" data-auto="true" data-map="#hotel-map">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">
+                                            <span aria-hidden="true">×</span>
+                                            <span class="sr-only">关闭</span>
+                                        </button>
+                                        <h4 class="modal-title">地址定位</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-inline">
+                                            <div class="form-group">
+                                                <label> 省份：</label>
+                                                <select data-level="province" class="form-control"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label> 城市：</label>
+                                                <select data-level="city" class="form-control"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label> 区：</label>
+                                                <select data-level="district" class="form-control"></select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label> 地址：</label>
+                                                <input type="text" data-level="address" class="form-control" />
+                                            </div>
+                                        </div>
+                                        <div style="margin-top:15px; width:100%; height:300px;" id="hotel-map" data-near-radius='2000' data-position='[120.170852,30.25868]'>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer" style="text-align:center;">
+                                        <button type="button" class="btn btn-default location-btn">定位</button>
+                                        <button type="button" id="save-btn" class="btn btn-primary" data-dismiss="modal">保存</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="//webapi.amap.com/maps?v=1.4.1&key=f73a77c363aa438c91f3fd46c5c0b981&plugin=AMap.DistrictSearch,AMap.Geocoder,AMap.PlaceSearch"></script>
+        <script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+        <script src="/dist/jquery.gaodemap.js"></script>
+        <script>
+            $(document).ready(function () {
+                var area = $('#map-box').gaodeArea().data('map.gaode.area');
+                $('#save-btn').click(function () {
+                    area.getValues(function (values) {
+                        //字段转换
+                        var map = {
+                            province: 'provinceCode',
+                            provinceText: 'province',
+                            city: 'cityCode',
+                            cityText: 'city',
+                            district: 'districtCode',
+                            districtText: 'district',
+                            address: 'address',
+                            location: 'geo'
+                        };
+                        //生成地理酒店地理位置信息的隐藏字段
+                        var html = '';
+                        for (var p in values) {
+                            var val = values[p];
+                            if (map[p])
+                                html += '<input type="hidden" name="' + map[p] + '" value="' +
+                                val + '"/>';
+                        }
+                        $('#hiddenArea').html(html);
+
+                        //组合完整地址
+                        $('#full-addr').html(
+                            values['provinceText'] +
+                            values['cityText'] +
+                            values['districtText'] +
+                            values['address']);
+                    });
+                    //查询酒店周边的信息,并生成隐藏字段
+                    area.searchNearBy('地铁站|机场|景点|公交站', function (pois) {
+                        $('#hiddenNearby').html($.map(pois, function (item) {
+                            var lng = item.location.lng;
+                            var lat = item.location.lat;
+                            var geo = '{"lng":' + lng + ',"lat":' + lat + '}';
+                            return "<input type='hidden' name='nearby' value='" +
+                                geo + "'/>";
+                        }).join(''));
+                    });
+                });
+                $('form').submit(function () {
+                    //如果直接提交表单，return true
+                    //如果ajax提交表单，在这里编写异步提交。return false
+                    return false;
+                });
+            });
+        </script>
+</body>
+
+</html>
