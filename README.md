@@ -1,6 +1,12 @@
 # jquery-gaodemap
 高德地图jquery行政区域地址定位插件
 
+使用地图控件的前提是要到高德地图开发平台注册账户，申请key
+
+```html
+<script type="text/javascript" src="//webapi.amap.com/maps?v=1.4.1&key=f73a77c363aa438c91f3fd46c5c0b981&plugin=AMap.DistrictSearch,AMap.Geocoder,AMap.PlaceSearch"></script>
+<script src="//webapi.amap.com/ui/1.0/main.js?v=1.0.11"></script>
+```
 
 ![模态框](demo/demo-1.png)
 
